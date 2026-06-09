@@ -45,8 +45,19 @@
         .tag { color: var(--accent); font-weight: 600; }
         
         .content { font-size: 17px; white-space: pre-wrap; word-wrap: break-word; }
-        .content img { max-width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); }
-        
+        /*.content img { max-width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); }
+        */
+        .content img { 
+            display: block;            /* 转为块级元素 */
+            max-width: 100%;           /* 保证手机端不溢出 */
+            max-height: 350px;         /* 限制图片的最大高度，防止大图太长 */
+            width: auto;               /* 允许图片根据自身比例缩放 */
+            height: auto;              /* 允许图片根据自身比例缩放 */
+            /*margin: 15px auto 0 auto;  /* 居中对齐 */
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+        }
+
         /* 画廊模式 */
         .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px; }
         .gallery img { height: 200px; width: 100%; object-fit: cover; margin-top:0; }
