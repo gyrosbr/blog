@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebook</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --text-main: #e5e5e5;
+            --text-dim: #737373;
+            --accent: #3b82f6; 
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            line-height: 1.7;
+            margin: 0;
+            padding: 60px 20px;
+        }
+
+        #main-wrapper {
+            max-width: 680px; 
+            margin: 0 auto;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .post-card { 
+            margin-bottom: 80px; 
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .meta { display: flex; gap: 15px; font-family: monospace; font-size: 13px; margin-bottom: 12px; }
+        .time { color: var(--text-dim); }
+        .tag { color: var(--accent); font-weight: 600; }
+        
+        .content { font-size: 17px; white-space: pre-wrap; word-wrap: break-word; }
+        /*.content img { max-width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); }
+        */
+        .content img { 
+            display: block;            /* 转为块级元素 */
+            max-width: 100%;           /* 保证手机端不溢出 */
+            max-height: 350px;         /* 限制图片的最大高度，防止大图太长 */
+            width: auto;               /* 允许图片根据自身比例缩放 */
+            height: auto;              /* 允许图片根据自身比例缩放 */
+            /*margin: 15px auto 0 auto;  /* 居中对齐 */
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+        }
+
+        /* 画廊模式 */
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px; }
+        .gallery img { height: 200px; width: 100%; object-fit: cover; margin-top:0; }
+
+        #pagination { margin-top: 80px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 30px; }
+        .page-btn { background: none; border: 1px solid var(--border); color: var(--text-main); padding: 8px 20px; border-radius: 6px; cursor: pointer; }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        footer { margin-top: 100px; text-align: center; font-size: 12px; color: var(--text-dim); }
+    </style>
+</head>
+<body>
+
+    <script>
+        // 定义数据仓库
+        let allPosts = [];
+        function add(time, text, color, tag) {
+            allPosts.push({ time, text, color, tag });
+        }
+    </script>
+
+    <script src="data.js"></script>
+
+    <div id="main-wrapper">
+        <div id="blog-container"></div>
+        
+        <div id="pagination">
+            <button id="btn-prev" class="page-btn" onclick="changePage(-1)">← Older</button>
+            <span id="page-info" style="color:var(--text-dim); font-size: 13px;"></span>
+            <button id="btn-next" class="page-btn" onclick="changePage(1)">Newer →</button>
+        </div>
+
+        <footer><p>© 2026. Less is More.| contact@yuk1no.com</p></footer>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 8;
+
+        function renderPosts() {
+            const container = document.getElementById('blog-container');
+            container.innerHTML = ''; 
+            
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const postsToShow = allPosts.slice(start, end);
+
+            postsToShow.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <div class="meta">
+                        <span class="tag">${post.tag || '#Normal'}</span>
+                        <span class="time">${post.time}</span>
+                    </div>
+                    <div class="content">${post.text}</div>
+                `;
+                container.appendChild(card);
+            });
+
+            const totalPages = Math.ceil(allPosts.length / itemsPerPage);
+            document.getElementById('page-info').innerText = `${currentPage} / ${totalPages || 1}`;
+            document.getElementById('btn-prev').disabled = (currentPage === 1);
+            document.getElementById('btn-next').disabled = (currentPage >= totalPages || totalPages === 0);
+        }
+
+        function changePage(step) {
+            currentPage += step;
+            renderPosts();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (allPosts.length > 0) allPosts.reverse(); 
+            renderPosts();
+            document.getElementById('main-wrapper').style.opacity = '1';
+        });
+    </script>
+</body>
+</html>
